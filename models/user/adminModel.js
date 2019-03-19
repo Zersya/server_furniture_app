@@ -20,7 +20,7 @@ AdminSchema = new Schema(
             type: String,
             required: 'Where is the email ?'
         }
-    }
+    }, {discriminatorKey: 'user'}
 );
 
 var Admin = User.discriminator('Admin', AdminSchema);

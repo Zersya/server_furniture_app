@@ -10,8 +10,8 @@ exports.login = (req, res) => {
 
     if(username && password){
         user.findOne({username: username}, (err, user) => {
-            if(err) res.send(err)
-            
+            if(err) res.send(err);
+
             if(user){
                 bcrypt.compare(password, user.password, (err, isMatch) => {
                     if(err) res.send(err)
