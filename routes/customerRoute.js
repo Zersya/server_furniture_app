@@ -1,8 +1,6 @@
-var auth = require('../controllers/Auth/authController');
+var customer = require('../controllers/Customer/customerController');
 
 module.exports = (app) => {
-    app.route('/api/login')
-        .post(auth.login)
     app.route('/api/register')
-        .post(auth.createCustomer)
+        .post(customer.createCustomer)
 }
