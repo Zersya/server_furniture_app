@@ -130,68 +130,130 @@ var readHTMLFile = async function(path, callback) {
 };
 
 exports.checkToken = (req, res) => {
-    var token = req.query.token;
+  var token = req.query.token;
 
-    if(token){
-        jwt.verify(token, process.env.secret_forgetpass, (err, decoded) => {
-            if(err) res.send(err)
-            user.findOne({reset_password_token: token}, (err, doc) => {
-                if(err) res.send(err)
-                if(doc){
-                    res.json({
-                        success: true,
-                        message: "Change Password Page."
-                      });
-                }else{
-
-                res.json({
-                    success: false,
-                    message: "Token is not valid."
-                  });
-                }
-            })
-        })
-    }else{
-        res.json({
-            success: false,
-            message: "Token required"
+  if (token) {
+    jwt.verify(token, process.env.secret_forgetpass, (err, decoded) => {
+      if (err) res.send(err);
+      user.findOne({ reset_password_token: token }, (err, doc) => {
+        if (err) res.send(err);
+        if (doc) {
+          res.json({
+            success: true,
+            message: "Change Password Page."
           });
-    }
+        } else {
+          res.json({
+            success: false,
+            message: "Token is not valid."
+          });
+        }
+      });
+    });
+  } else {
+    res.json({
+      success: false,
+      message: "Token required"
+    });
+  }
 };
 
 exports.resetPasswordToken = (req, res) => {
-    var password = req.body.password
-    var token = req.query.token;
+  var password = req.body.password;
+  var token = req.query.token;
 
-    if(token){
-        jwt.verify(token, process.env.secret_forgetpass, (err, decoded) => {
-            if(err) res.send(err)
-            user.findOneAndUpdate({reset_password_token: token}, {
-                password: password,
-                reset_password_token: ''
-            }, (err, doc) => {
-                if(err) res.send(err)
-                if(doc){
-                    doc.blacklisted_token.push(token)
-                    doc.save()
+  if (token) {
+    jwt.verify(token, process.env.secret_forgetpass, (err, decoded) => {
+      if (err) res.send(err);
+      user.findOneAndUpdate(
+        { reset_password_token: token },
+        {
+          password: password,
+          reset_password_token: ""
+        },
+        (err, doc) => {
+          if (err) res.send(err);
+          if (doc) {
+            doc.blacklisted_token.push(token);
+            doc.save();
 
-                    res.json({
-                        success: true,
-                        message: "Success Changed Password"
-                      });
-                }else{
-
-                res.json({
-                    success: false,
-                    message: "Token is not valid."
-                  });
-                }
-            })
-        })
-    }else{
-        res.json({
-            success: false,
-            message: "Token required"
-          });
-    }
+            res.json({
+              success: true,
+              message: "Success Changed Password"
+            });
+          } else {
+            res.json({
+              success: false,
+              message: "Token is not valid."
+            });
+          }
+        }
+      );
+    });
+  } else {
+    res.json({
+      success: false,
+      message: "Token required"
+    });
+  }
 };
+
+exports.resetPassword = (req, res) => {
+  var username = getUsername(req);
+  var old_password = req.body.old_password;
+  var password = req.body.password;
+  var conf_password = req.body.conf_password;
+
+  if (!old_password || !password || !conf_password) {
+    res.json({
+      success: false,
+      message: "Please fill the field area"
+    });
+  } else {
+    if (!username) {
+      res.json({
+        success: false,
+        message: "Token is not valid."
+      });
+    } else {
+      user.findOne({ username: username }, (err, user) => {
+        var isMatch = bcrypt.compareSync(old_password, user.password);
+        if (isMatch) {
+          if (password == conf_password) {
+            user.password = password;
+            user.save();
+
+            res.json({
+              success: true,
+              message: "Password is changed!"
+            });
+          } else {
+            res.json({
+              success: false,
+              message:
+                "New password does not match with the confirmation password"
+            });
+          }
+        } else {
+          res.json({
+            success: false,
+            message: "Old password is not match."
+          });
+        }
+      });
+    }
+  }
+};
+
+function getUsername(req) {
+  let token = req.headers["x-access-token"] || req.headers["authorization"]; // Express headers are auto converted to lowercase
+  if (token && token.startsWith("Bearer ")) {
+    // Remove Bearer from string
+    token = token.slice(7, token.length);
+  }
+  var username = "";
+  jwt.verify(token, process.env.secret, (err, decode) => {
+    username = decode.username;
+  });
+  return username;
+}
