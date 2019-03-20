@@ -15,10 +15,20 @@ var UserSchema = new Schema(
             type: String, 
             required: 'Where is the password ?'
         },
+        email:{
+            type: String,
+            required: 'Where is the email ?'
+        },
         created_at: {
             type: Date,
             default: new Date()
         },
+        reset_password_token: {
+            type: String,
+        },
+        blacklisted_token: {
+          type: Array
+        }
     }, {discriminatorKey: 'user' }
 )
 

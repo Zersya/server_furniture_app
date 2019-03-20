@@ -1,8 +1,13 @@
 var auth = require('../controllers/Auth/authController');
 
 module.exports = (app) => {
-    app.route('/api/login')
+    app.route('/api/auth/login')
         .post(auth.login)
         
-   
+   app.route('/api/auth/forgetPassword')
+        .post(auth.forgetPassword)
+
+    app.route('/api/auth/resetPassword')
+        .get(auth.checkToken)
+        .post(auth.resetPasswordToken)
 }

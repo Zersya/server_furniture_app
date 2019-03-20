@@ -15,10 +15,6 @@ AdminSchema = new Schema(
             min: [4, 'Too few characters'],
             max: [24, 'Too many characters'],
             required: 'Where is the phoneNumber ?'
-        },
-        email:{
-            type: String,
-            required: 'Where is the email ?'
         }
     }, {discriminatorKey: 'user'}
 );
