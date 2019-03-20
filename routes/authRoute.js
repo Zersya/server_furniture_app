@@ -14,4 +14,6 @@ module.exports = app => {
   app
     .route("/api/customer/resetPassword")
     .post(authMiddleware.checkTokenCustomer, auth.resetPassword);
+
+  app.route("/api/auth/logout").get(authMiddleware.checkToken, auth.logout);
 };

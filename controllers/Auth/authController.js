@@ -26,6 +26,7 @@ exports.login = (req, res) => {
 
             res.json({
               success: true,
+              type: user.user,
               message: "Authentication success",
               token: token
             });
@@ -77,7 +78,8 @@ exports.forgetPassword = (req, res) => {
                     var replacements = {
                       name: doc.name,
                       url:
-                        "http://localhost:3000/api/auth/resetPassword?token=" +
+                        process.env.website +
+                        "api/auth/resetPassword?token=" +
                         token
                     };
                     var htmlToSend = template(replacements);
@@ -199,7 +201,8 @@ exports.resetPasswordToken = (req, res) => {
 };
 
 exports.resetPassword = (req, res) => {
-  var username = getUsername(req);
+  var data = getData(req);
+  var username = data.username;
   var old_password = req.body.old_password;
   var password = req.body.password;
   var conf_password = req.body.conf_password;
@@ -210,6 +213,11 @@ exports.resetPassword = (req, res) => {
       message: "Please fill the field area"
     });
   } else {
+    if (!data.token)
+      res.json({
+        success: false,
+        message: "Token cannot be empty."
+      });
     if (!username) {
       res.json({
         success: false,
@@ -245,7 +253,31 @@ exports.resetPassword = (req, res) => {
   }
 };
 
-function getUsername(req) {
+exports.logout = (req, res) => {
+  var data = getData(req);
+  if (!data.token)
+    res.json({
+      success: false,
+      message: "Token cannot be empty."
+    });
+  if (!data.username)
+    res.json({
+      success: false,
+      message: "Token is not valid."
+    });
+
+  user.findOne({ username: data.username }, (err, user) => {
+      user.blacklisted_token.push(data.token);
+      user.save()
+
+      res.json({
+        success: true,
+        message: "Success logout"
+      });
+  });
+};
+
+function getData(req) {
   let token = req.headers["x-access-token"] || req.headers["authorization"]; // Express headers are auto converted to lowercase
   if (token && token.startsWith("Bearer ")) {
     // Remove Bearer from string
@@ -255,5 +287,8 @@ function getUsername(req) {
   jwt.verify(token, process.env.secret, (err, decode) => {
     username = decode.username;
   });
-  return username;
+  return {
+    token: token,
+    username: username
+  };
 }
