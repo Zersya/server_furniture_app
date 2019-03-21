@@ -1,0 +1,57 @@
+const gcsHelpers = require("../Utils/google-cloud-storage");
+
+const { storage } = gcsHelpers;
+
+const DEFAULT_BUCKET_NAME = "harpah_images_items"; // Replace with the name of your bucket
+
+/**
+ * Middleware for uploading file to GCS.
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Function} next
+ * @return {*}
+ */
+exports.sendUploadToGCS = (req, res, next) => {
+  if (!req.files) {
+    return next();
+  }
+
+  const bucketName = req.body.bucketName || DEFAULT_BUCKET_NAME;
+
+  const bucket = storage.bucket(bucketName);
+
+  var files = [];
+
+  req.files.forEach((element, i) => {
+    const gcsFileName = `${Date.now()}-${req.body.name}-${i}`;
+    element.gcsUrl = i;
+    const file = bucket.file(gcsFileName);
+
+    const stream = file.createWriteStream({
+      metadata: {
+        contentType: element.mimetype
+      }
+    });
+
+    stream.on("error", err => {
+      element.cloudStorageError = err;
+      next(err);
+    });
+
+    stream.on("finish", () => {
+      element.cloudStorageObject = gcsFileName;
+
+      return file.makePublic().then(() => {
+        element.gcsUrl = gcsHelpers.getPublicUrl(bucketName, gcsFileName);
+        files.push(element);
+        if(files.length == req.files.length){
+            req.files = files
+            next();
+        }
+      });
+    });
+
+    stream.end(element.buffer);
+  });
+
+};

@@ -78,7 +78,7 @@ checkTokenAdmin = (req, res, next) => {
             message: "Token is blacklisted"
           });
         } else {
-          if (req.decoded.user == "Admin") next();
+          if (req.decoded.user == "Admin") next()
           else {
             return res.json({
               success: false,

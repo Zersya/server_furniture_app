@@ -20,6 +20,14 @@ var ItemSchema = new Schema({
         type: Number,
         required: 'How many is the item ?'
     },
+    urlImages: {
+        type: Array,
+        required: 'Where is the urlImages ?'
+    },
+    nameImages: {
+        type: Array,
+        required: 'Where is the nameImages ?'
+    },
     created_by: {
         type: Schema.Types.ObjectId,
         ref: 'User',
