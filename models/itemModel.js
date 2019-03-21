@@ -16,6 +16,19 @@ var ItemSchema = new Schema({
         type: String,
         required: 'What is the category ?'
     },
+    quantity: {
+        type: Number,
+        required: 'How many is the item ?'
+    },
+    created_by: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: 'Who is the Operator ?'
+    },
+    created_date: {
+        type: Date,
+        default: new Date
+    }
 
 });
 

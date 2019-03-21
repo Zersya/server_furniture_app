@@ -5,6 +5,7 @@ var fs = require("fs");
 var handlebars = require("handlebars");
 
 var user = require("../../models/user/userModel");
+var tokenUtils = require('../../Utils/tokenUtils')
 
 exports.login = (req, res) => {
   var username = req.body.username;
@@ -23,7 +24,7 @@ exports.login = (req, res) => {
               process.env.secret,
               { expiresIn: "24h" }
             );
-
+              // console.log(user)
             res.json({
               success: true,
               type: user.user,
@@ -202,7 +203,7 @@ exports.resetPasswordToken = (req, res) => {
 };
 
 exports.resetPassword = (req, res) => {
-  var data = getData(req);
+  var data = tokenUtils.getDataFromToken(req);
   var username = data.username;
   var old_password = req.body.old_password;
   var password = req.body.password;
@@ -255,7 +256,7 @@ exports.resetPassword = (req, res) => {
 };
 
 exports.logout = (req, res) => {
-  var data = getData(req);
+  var data = tokenUtils.getDataFromToken(req);
   if (!data.token)
     res.json({
       success: false,
@@ -277,19 +278,3 @@ exports.logout = (req, res) => {
     });
   });
 };
-
-function getData(req) {
-  let token = req.headers["x-access-token"] || req.headers["authorization"]; // Express headers are auto converted to lowercase
-  if (token && token.startsWith("Bearer ")) {
-    // Remove Bearer from string
-    token = token.slice(7, token.length);
-  }
-  var username = "";
-  jwt.verify(token, process.env.secret, (err, decode) => {
-    username = decode.username;
-  });
-  return {
-    token: token,
-    username: username
-  };
-}
