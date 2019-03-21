@@ -163,34 +163,35 @@ exports.checkToken = (req, res) => {
 exports.resetPasswordToken = (req, res) => {
   var password = req.body.password;
   var token = req.query.token;
-
   if (token) {
     jwt.verify(token, process.env.secret_forgetpass, (err, decoded) => {
       if (err) res.send(err);
-      user.findOneAndUpdate(
-        { reset_password_token: token },
-        {
-          password: password,
-          reset_password_token: ""
-        },
-        (err, doc) => {
-          if (err) res.send(err);
-          if (doc) {
-            doc.blacklisted_token.push(token);
-            doc.save();
+      else {
+        user.findOneAndUpdate(
+          { reset_password_token: token },
+          {
+            password: password,
+            reset_password_token: ""
+          },
+          (err, doc) => {
+            if (err) res.send(err);
+            if (doc) {
+              doc.blacklisted_token.push(token);
+              doc.save();
 
-            res.json({
-              success: true,
-              message: "Success Changed Password"
-            });
-          } else {
-            res.json({
-              success: false,
-              message: "Token is not valid."
-            });
+              res.json({
+                success: true,
+                message: "Success Changed Password"
+              });
+            } else {
+              res.json({
+                success: false,
+                message: "Token is not valid."
+              });
+            }
           }
-        }
-      );
+        );
+      }
     });
   } else {
     res.json({
@@ -267,13 +268,13 @@ exports.logout = (req, res) => {
     });
 
   user.findOne({ username: data.username }, (err, user) => {
-      user.blacklisted_token.push(data.token);
-      user.save()
+    user.blacklisted_token.push(data.token);
+    user.save();
 
-      res.json({
-        success: true,
-        message: "Success logout"
-      });
+    res.json({
+      success: true,
+      message: "Success logout"
+    });
   });
 };
 
