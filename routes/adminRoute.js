@@ -22,4 +22,9 @@ module.exports = (app) => {
     app.route('/api/admin/manage_item')
         .get(authMiddleware.checkTokenAdmin, item.listItem)
         .post([authMiddleware.checkTokenAdmin, multer.array('images', 6), gcsMiddleware.sendUploadToGCS], item.createItem)
+      
+    app.route('/api/admin/manage_item/image/:itemId')
+        .post([authMiddleware.checkTokenAdmin, multer.array('images', 6), gcsMiddleware.sendUploadToGCS], item.addOnlyImage)
+        .delete(authMiddleware.checkTokenAdmin, item.deleteOnlyImage)
+        
 }

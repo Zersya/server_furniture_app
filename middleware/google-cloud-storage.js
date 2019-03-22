@@ -1,4 +1,5 @@
 const gcsHelpers = require("../Utils/google-cloud-storage");
+const item = require("../models/itemModel");
 
 const { storage } = gcsHelpers;
 
@@ -20,38 +21,51 @@ exports.sendUploadToGCS = (req, res, next) => {
 
   const bucket = storage.bucket(bucketName);
 
-  var files = [];
-
-  req.files.forEach((element, i) => {
-    const gcsFileName = `${Date.now()}-${req.body.name}-${i}`;
-    element.gcsUrl = i;
-    const file = bucket.file(gcsFileName);
-
-    const stream = file.createWriteStream({
-      metadata: {
-        contentType: element.mimetype
-      }
-    });
-
-    stream.on("error", err => {
-      element.cloudStorageError = err;
-      next(err);
-    });
-
-    stream.on("finish", () => {
-      element.cloudStorageObject = gcsFileName;
-
-      return file.makePublic().then(() => {
-        element.gcsUrl = gcsHelpers.getPublicUrl(bucketName, gcsFileName);
-        files.push(element);
-        if(files.length == req.files.length){
-            req.files = files
-            next();
-        }
+  var filename = req.body.name;
+  item.findById(req.params.itemId, (err, _item) => {
+    if (err) {
+      res.json({
+        success: false,
+        message: "ItemId not valid"
       });
-    });
-
-    stream.end(element.buffer);
+    } else {
+      filename = _item.name;
+      processImages();
+    }
   });
 
+  var files = [];
+  function processImages() {
+    return req.files.forEach((element, i) => {
+      const gcsFileName = `${Date.now()}-${filename}-${i}`;
+      element.gcsUrl = i;
+      const file = bucket.file(gcsFileName);
+
+      const stream = file.createWriteStream({
+        metadata: {
+          contentType: element.mimetype
+        }
+      });
+
+      stream.on("error", err => {
+        element.cloudStorageError = err;
+        next(err);
+      });
+
+      stream.on("finish", () => {
+        element.cloudStorageObject = gcsFileName;
+
+        return file.makePublic().then(() => {
+          element.gcsUrl = gcsHelpers.getPublicUrl(bucketName, gcsFileName);
+          files.push(element);
+          if (files.length == req.files.length) {
+            req.files = files;
+            next();
+          }
+        });
+      });
+
+      stream.end(element.buffer);
+    });
+  }
 };

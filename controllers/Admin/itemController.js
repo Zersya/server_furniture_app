@@ -1,6 +1,10 @@
 var item = require("../../models/itemModel");
+var image = require("../../models/imageModel");
 var user = require("../../models/user/userModel");
 var tokenUtils = require("../../Utils/tokenUtils");
+
+const gcsHelpers = require("../../Utils/google-cloud-storage");
+
 
 exports.createItem = (req, res) => {
   var dataUser = tokenUtils.getDataFromToken(req);
@@ -21,8 +25,15 @@ exports.createItem = (req, res) => {
       } else {
         var newItem = new item(req.body);
         req.files.forEach(element => {
-          newItem.urlImages.push(element.gcsUrl);
-          newItem.nameImages.push(element.cloudStorageObject);
+          const _image = {
+            item: newItem._id,
+            nameImage: element.cloudStorageObject,
+            urlImage: element.gcsUrl
+          };
+          var newImage = new image(_image);
+          newItem.images.push(newImage._id);
+
+          newImage.save();
         });
         newItem.save(callbackSave);
       }
@@ -44,7 +55,8 @@ exports.createItem = (req, res) => {
 exports.listItem = (req, res) => {
   item
     .find({})
-    .populate("created_by", 'name')
+    .populate("created_by", "name")
+    .populate("images", "nameImage item urlImage")
     .exec(callBacklistItem());
 
   function callBacklistItem() {
@@ -52,7 +64,7 @@ exports.listItem = (req, res) => {
       if (err) res.send(err);
 
       if (item) {
-        res.json(item);
+        res.json(item.reverse());
       } else {
         res.json({
           success: true,
@@ -62,3 +74,86 @@ exports.listItem = (req, res) => {
     };
   }
 };
+
+exports.deleteItem = (req, res) => {};
+
+exports.detailItem = (req, res) => {};
+
+exports.deleteOnlyImage = (req, res) => {
+  const { storage } = gcsHelpers;
+
+  const bucketName = "harpah_images_items";
+  const imageId = req.query.imageId;
+  const itemId = req.params.itemId
+  image.findOneAndDelete({ _id: imageId }, callbackfind());
+
+  function callbackfind() {
+    return function(err, _image) {
+      if (err) res.send(err);
+      
+      if (_image && _image.item == itemId) {
+        item.updateOne({_id: _image.item }, { $pull: {images: _image._id }}, async (err) => {
+          if (err) res.send(err);
+
+          await storage
+            .bucket(bucketName)
+            .file(_image.nameImage)
+            .delete();
+
+          res.json({
+            success: true,
+            message: "Success deleted " + _image.nameImage
+          });
+        })
+
+      }else{
+        res.json({
+          success: false,
+          message: "Image Id " + imageId + ' not found'
+        });
+      }
+    };
+  }
+};
+
+exports.addOnlyImage = (req, res) => {
+  // var dataUser = tokenUtils.getDataFromToken(req);
+  
+  const itemId = req.params.itemId
+  item.findById(itemId, (err, _item) => {
+    if(err) res.send(err)
+
+    if(_item){
+      req.files.forEach(element => {
+        const _image = {
+          item: _item._id,
+          nameImage: element.cloudStorageObject,
+          urlImage: element.gcsUrl
+        };
+        var newImage = new image(_image);
+        _item.images.push(newImage._id);
+        _item.save()
+        newImage.save(callbackSave);
+      });
+
+    }else{
+      res.json({
+        success: false,
+        message: "ItemId not valid"
+      });
+    }
+  })
+
+  
+
+  var callbackSave = (err, item) => {
+    if (err) res.send(err);
+
+    if (item) {
+      res.json({
+        success: true,
+        message: "Adding success"
+      });
+    }
+  };
+}
