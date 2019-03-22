@@ -5,7 +5,6 @@ var tokenUtils = require("../../Utils/tokenUtils");
 
 const gcsHelpers = require("../../Utils/google-cloud-storage");
 
-
 exports.createItem = (req, res) => {
   var dataUser = tokenUtils.getDataFromToken(req);
   var prevBody = req.body;
@@ -52,6 +51,25 @@ exports.createItem = (req, res) => {
   };
 };
 
+exports.updateItem = (req, res) => {
+  const itemId = req.params.itemId;
+  item.findByIdAndUpdate(itemId, req.body, (err, _item) => {
+    if (err) res.send(err);
+
+    if (_item) {
+      res.json({
+        success: true,
+        message: "Success updated " + _item.name
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "ItemId not valid"
+      });
+    }
+  });
+};
+
 exports.listItem = (req, res) => {
   item
     .find({})
@@ -79,65 +97,95 @@ exports.deleteItem = (req, res) => {
   const { storage } = gcsHelpers;
 
   const bucketName = "harpah_images_items";
-  const itemId = req.params.itemId
-  var itemName = ''
-  
+  const itemId = req.params.itemId;
+  var itemName = "";
+
   item.findByIdAndDelete(itemId, (err, _item) => {
-    _item.images.forEach(element => {
-      itemName = _item.name
-      image.findByIdAndDelete(element, callbackDeleteStorage())
-    });
-    res.json({
-      success: true,
-      message: "Success deleted " + itemName
-    });
-  })
+    if (err) res.send(err);
+
+    if (_item) {
+      _item.images.forEach(element => {
+        itemName = _item.name;
+        image.findByIdAndDelete(element, callbackDeleteStorage());
+      });
+      res.json({
+        success: true,
+        message: "Success deleted " + itemName
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "ItemId not valid"
+      });
+    }
+  });
 
   function callbackDeleteStorage() {
     return async function(err, _image) {
       if (err) res.send(err);
-      
+
       await storage
-            .bucket(bucketName)
-            .file(_image.nameImage)
-            .delete();
+        .bucket(bucketName)
+        .file(_image.nameImage)
+        .delete();
     };
   }
 };
 
-exports.detailItem = (req, res) => {};
+exports.detailItem = (req, res) => {
+  const itemId = req.params.itemId;
+
+  item
+    .findById(itemId)
+    .populate("images", "nameImage urlImage")
+    .populate("created_by", "username name email phoneNumber created_at")
+    .exec(callbackFind());
+
+  function callbackFind() {
+    return function(err, _item) {
+      if (err) res.send(err);
+
+      if (_item) {
+        res.json(_item);
+      }
+    };
+  }
+};
 
 exports.deleteOnlyImage = (req, res) => {
   const { storage } = gcsHelpers;
 
   const bucketName = "harpah_images_items";
   const imageId = req.query.imageId;
-  const itemId = req.params.itemId
+  const itemId = req.params.itemId;
   image.findOneAndDelete({ _id: imageId }, callbackfind());
 
   function callbackfind() {
     return function(err, _image) {
       if (err) res.send(err);
-      
+
       if (_image && _image.item == itemId) {
-        item.updateOne({_id: _image.item }, { $pull: {images: _image._id }}, async (err) => {
-          if (err) res.send(err);
+        item.updateOne(
+          { _id: _image.item },
+          { $pull: { images: _image._id } },
+          async err => {
+            if (err) res.send(err);
 
-          await storage
-            .bucket(bucketName)
-            .file(_image.nameImage)
-            .delete();
+            await storage
+              .bucket(bucketName)
+              .file(_image.nameImage)
+              .delete();
 
-          res.json({
-            success: true,
-            message: "Success deleted " + _image.nameImage
-          });
-        })
-
-      }else{
+            res.json({
+              success: true,
+              message: "Success deleted " + _image.nameImage
+            });
+          }
+        );
+      } else {
         res.json({
           success: false,
-          message: "Image Id " + imageId + ' not found'
+          message: "Image Id " + imageId + " not found"
         });
       }
     };
@@ -145,13 +193,12 @@ exports.deleteOnlyImage = (req, res) => {
 };
 
 exports.addOnlyImage = (req, res) => {
-  // var dataUser = tokenUtils.getDataFromToken(req);
-  
-  const itemId = req.params.itemId
-  item.findById(itemId, (err, _item) => {
-    if(err) res.send(err)
+  const itemId = req.params.itemId;
 
-    if(_item){
+  item.findById(itemId, (err, _item) => {
+    if (err) res.send(err);
+
+    if (_item) {
       req.files.forEach(element => {
         const _image = {
           item: _item._id,
@@ -160,19 +207,16 @@ exports.addOnlyImage = (req, res) => {
         };
         var newImage = new image(_image);
         _item.images.push(newImage._id);
-        _item.save()
+        _item.save();
         newImage.save(callbackSave);
       });
-
-    }else{
+    } else {
       res.json({
         success: false,
         message: "ItemId not valid"
       });
     }
-  })
-
-  
+  });
 
   var callbackSave = (err, item) => {
     if (err) res.send(err);
@@ -184,4 +228,4 @@ exports.addOnlyImage = (req, res) => {
       });
     }
   };
-}
+};

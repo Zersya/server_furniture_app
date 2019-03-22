@@ -32,6 +32,8 @@ module.exports = app => {
 
   app
     .route("/api/admin/manage_item/:itemId")
+      .get(authMiddleware.checkTokenAdmin, item.detailItem)
+      .put(authMiddleware.checkTokenAdmin, item.updateItem)
       .delete(authMiddleware.checkTokenAdmin, item.deleteItem);
 
   app
