@@ -75,7 +75,35 @@ exports.listItem = (req, res) => {
   }
 };
 
-exports.deleteItem = (req, res) => {};
+exports.deleteItem = (req, res) => {
+  const { storage } = gcsHelpers;
+
+  const bucketName = "harpah_images_items";
+  const itemId = req.params.itemId
+  var itemName = ''
+  
+  item.findByIdAndDelete(itemId, (err, _item) => {
+    _item.images.forEach(element => {
+      itemName = _item.name
+      image.findByIdAndDelete(element, callbackDeleteStorage())
+    });
+    res.json({
+      success: true,
+      message: "Success deleted " + itemName
+    });
+  })
+
+  function callbackDeleteStorage() {
+    return async function(err, _image) {
+      if (err) res.send(err);
+      
+      await storage
+            .bucket(bucketName)
+            .file(_image.nameImage)
+            .delete();
+    };
+  }
+};
 
 exports.detailItem = (req, res) => {};
 

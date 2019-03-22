@@ -20,8 +20,7 @@ exports.sendUploadToGCS = (req, res, next) => {
   const bucketName = req.body.bucketName || DEFAULT_BUCKET_NAME;
 
   const bucket = storage.bucket(bucketName);
-
-  var filename = req.body.name;
+  var filename = ''
   item.findById(req.params.itemId, (err, _item) => {
     if (err) {
       res.json({
@@ -29,7 +28,7 @@ exports.sendUploadToGCS = (req, res, next) => {
         message: "ItemId not valid"
       });
     } else {
-      filename = _item.name;
+      filename = req.body.name || _item.name;
       processImages();
     }
   });
