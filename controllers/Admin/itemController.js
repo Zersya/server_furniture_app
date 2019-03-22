@@ -63,23 +63,32 @@ exports.updateItem = (req, res) => {
     } else {
       res.json({
         success: false,
-        message: "Item Id " + itemId + ' not found'
+        message: "Item Id " + itemId + " not found"
       });
     }
   });
 };
 
 exports.listItem = (req, res) => {
-  item
-    .find({})
-    .populate("created_by", "name")
-    .populate("images", "nameImage item urlImage")
-    .exec(callBacklistItem());
+  if (Object.keys(req.query).length == 0) {
+    item
+      .find({})
+      .populate("created_by", "name")
+      .populate("images", "nameImage item urlImage")
+      .exec(callBacklistItem());
+  } else {
+    item
+      .find({$or: [
+        {name: { $regex: ".*" + req.query.searchName + ".*" }},
+        {category: { $regex: ".*" + req.query.searchCategory + ".*" }}
+      ]})
+      .populate("created_by", "name")
+      .populate("images", "nameImage item urlImage")
+      .exec(callBacklistItem());
+  }
 
   function callBacklistItem() {
     return function(err, item) {
-      if (err) res.send(err);
-
       if (item) {
         res.json(item.reverse());
       } else {
@@ -112,7 +121,7 @@ exports.deleteItem = (req, res) => {
     } else {
       res.json({
         success: false,
-        message: "Item Id " + itemId + ' not found'
+        message: "Item Id " + itemId + " not found"
       });
     }
   });
@@ -144,10 +153,10 @@ exports.detailItem = (req, res) => {
 
       if (_item) {
         res.json(_item);
-      }else{
+      } else {
         res.json({
           success: false,
-          message: "Item Id " + itemId + ' not found'
+          message: "Item Id " + itemId + " not found"
         });
       }
     };
@@ -165,8 +174,10 @@ exports.deleteOnlyImage = (req, res) => {
   function callbackfind() {
     return function(err, _image) {
       if (_image) {
-        if(_image.item == itemId){
-          image.deleteOne({_id: imageId}, (err)=> {if(err) res.send(err)})
+        if (_image.item == itemId) {
+          image.deleteOne({ _id: imageId }, err => {
+            if (err) res.send(err);
+          });
 
           item.updateOne(
             { _id: _image.item },
@@ -183,15 +194,14 @@ exports.deleteOnlyImage = (req, res) => {
                 success: true,
                 message: "Success deleted " + _image.nameImage
               });
-              
             }
           );
-       }else{
-        res.json({
-          success: false,
-          message: "Item Id " + itemId + ' not found'
-        });
-       }
+        } else {
+          res.json({
+            success: false,
+            message: "Item Id " + itemId + " not found"
+          });
+        }
       } else {
         res.json({
           success: false,
@@ -223,7 +233,7 @@ exports.addOnlyImage = (req, res) => {
     } else {
       res.json({
         success: false,
-        message: "Item Id " + itemId + ' not found'
+        message: "Item Id " + itemId + " not found"
       });
     }
   });
