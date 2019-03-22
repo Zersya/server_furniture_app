@@ -53,9 +53,8 @@ exports.createItem = (req, res) => {
 
 exports.updateItem = (req, res) => {
   const itemId = req.params.itemId;
-  item.findByIdAndUpdate(itemId, req.body, (err, _item) => {
-    if (err) res.send(err);
 
+  item.findByIdAndUpdate(itemId, req.body, (err, _item) => {
     if (_item) {
       res.json({
         success: true,
@@ -64,7 +63,7 @@ exports.updateItem = (req, res) => {
     } else {
       res.json({
         success: false,
-        message: "ItemId not valid"
+        message: "Item Id " + itemId + ' not found'
       });
     }
   });
@@ -101,8 +100,6 @@ exports.deleteItem = (req, res) => {
   var itemName = "";
 
   item.findByIdAndDelete(itemId, (err, _item) => {
-    if (err) res.send(err);
-
     if (_item) {
       _item.images.forEach(element => {
         itemName = _item.name;
@@ -115,7 +112,7 @@ exports.deleteItem = (req, res) => {
     } else {
       res.json({
         success: false,
-        message: "ItemId not valid"
+        message: "Item Id " + itemId + ' not found'
       });
     }
   });
@@ -147,6 +144,11 @@ exports.detailItem = (req, res) => {
 
       if (_item) {
         res.json(_item);
+      }else{
+        res.json({
+          success: false,
+          message: "Item Id " + itemId + ' not found'
+        });
       }
     };
   }
@@ -158,30 +160,38 @@ exports.deleteOnlyImage = (req, res) => {
   const bucketName = "harpah_images_items";
   const imageId = req.query.imageId;
   const itemId = req.params.itemId;
-  image.findOneAndDelete({ _id: imageId }, callbackfind());
+  image.findOne({ _id: imageId }, callbackfind());
 
   function callbackfind() {
     return function(err, _image) {
-      if (err) res.send(err);
+      if (_image) {
+        if(_image.item == itemId){
+          image.deleteOne({_id: imageId}, (err)=> {if(err) res.send(err)})
 
-      if (_image && _image.item == itemId) {
-        item.updateOne(
-          { _id: _image.item },
-          { $pull: { images: _image._id } },
-          async err => {
-            if (err) res.send(err);
+          item.updateOne(
+            { _id: _image.item },
+            { $pull: { images: _image._id } },
+            async err => {
+              if (err) res.send(err);
 
-            await storage
-              .bucket(bucketName)
-              .file(_image.nameImage)
-              .delete();
+              await storage
+                .bucket(bucketName)
+                .file(_image.nameImage)
+                .delete();
 
-            res.json({
-              success: true,
-              message: "Success deleted " + _image.nameImage
-            });
-          }
-        );
+              res.json({
+                success: true,
+                message: "Success deleted " + _image.nameImage
+              });
+              
+            }
+          );
+       }else{
+        res.json({
+          success: false,
+          message: "Item Id " + itemId + ' not found'
+        });
+       }
       } else {
         res.json({
           success: false,
@@ -213,7 +223,7 @@ exports.addOnlyImage = (req, res) => {
     } else {
       res.json({
         success: false,
-        message: "ItemId not valid"
+        message: "Item Id " + itemId + ' not found'
       });
     }
   });
