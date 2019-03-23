@@ -7,6 +7,7 @@ var UserSchema = new Schema(
     username: {
       type: String,
       unique: true,
+      lowercase: true,
       min: [4, "Too few characters"],
       max: [8, "Too many characters"],
       required: "Where is the username ?"
@@ -23,11 +24,17 @@ var UserSchema = new Schema(
       type: Date,
       default: new Date()
     },
+    login_token: {
+      type: String
+    },
     reset_password_token: {
       type: String
     },
     blacklisted_token: {
       type: Array
+    },
+    last_login: {
+      type: Date
     }
   },
   { discriminatorKey: "user" }

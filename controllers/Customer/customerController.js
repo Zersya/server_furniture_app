@@ -13,7 +13,7 @@ exports.createCustomer = (req, res) => {
         process.env.secret,
         { expiresIn: "24h" }
       );
-
+        
       res.json({
         success: true,
         message: "Sign up success",

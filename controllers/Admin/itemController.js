@@ -54,18 +54,29 @@ exports.createItem = (req, res) => {
 exports.updateItem = (req, res) => {
   const itemId = req.params.itemId;
 
-  item.findByIdAndUpdate(itemId, req.body, (err, _item) => {
-    if (_item) {
-      res.json({
-        success: true,
-        message: "Success updated " + _item.name
-      });
-    } else {
-      res.json({
-        success: false,
-        message: "Item Id " + itemId + " not found"
-      });
-    }
+  item.findById(itemId, (err, _item) => {
+
+    _item.name = req.body.name || _item.name || 'empty'
+    _item.price = req.body.price || _item.price || 0
+    _item.category = req.body.category || _item.category || 'empty'
+    _item.quantity = req.body.quantity || _item.quantity || 0
+
+    _item.save((err, __item) => {
+      if(err) res.send(err)
+
+      if (__item) {
+        res.json({
+          success: true,
+          message: "Success updated " + __item.name
+        });
+      } else {
+        res.json({
+          success: false,
+          message: "Item Id " + itemId + " not found"
+        });
+      }
+    })
+   
   });
 };
 

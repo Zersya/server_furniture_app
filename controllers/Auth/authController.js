@@ -5,40 +5,18 @@ var fs = require("fs");
 var handlebars = require("handlebars");
 
 var user = require("../../models/user/userModel");
-var tokenUtils = require('../../Utils/tokenUtils')
+var tokenUtils = require("../../Utils/tokenUtils");
 
 exports.login = (req, res) => {
   var username = req.body.username;
   var password = req.body.password;
 
   if (username && password) {
-    user.findOne({ username: username }, (err, user) => {
+    user.findOne({ username: username }, (err, _user) => {
       if (err) res.send(err);
 
-      if (user) {
-        bcrypt.compare(password, user.password, (err, isMatch) => {
-          if (err) res.send(err);
-          if (isMatch) {
-            var token = jwt.sign(
-              { user: user.user, username: username },
-              process.env.secret,
-              { expiresIn: "24h" }
-            );
-              // console.log(user)
-            res.json({
-              success: true,
-              type: user.user,
-              message: "Authentication success",
-              token: token
-            });
-          } else {
-            res.json({
-              success: false,
-              message: "Incorrect username or password",
-              token: token
-            });
-          }
-        });
+      if (_user) {
+        bcrypt.compare(password, _user.password, callBackpasswordCompare(_user));
       } else {
         res.json({
           success: false,
@@ -51,6 +29,35 @@ exports.login = (req, res) => {
       success: false,
       message: "Please fill username and password field"
     });
+  }
+
+  function callBackpasswordCompare(_user){
+    return function (err, isMatch) {
+      if (err) res.send(err);
+      if (isMatch) {
+        var token = jwt.sign(
+          { user: _user.user, username: username },
+          process.env.secret,
+          { expiresIn: "24h" }
+        );
+        
+        _user.last_login = new Date();
+        _user.login_token = token;
+        _user.save();
+        res.json({
+          success: true,
+          type: _user.user,
+          message: "Authentication success",
+          token: token
+        });
+      } else {
+        res.json({
+          success: false,
+          message: "Incorrect username or password",
+          token: token
+        });
+      }
+    }
   }
 };
 

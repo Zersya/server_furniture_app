@@ -5,14 +5,14 @@ var mongoose = require("mongoose"),
 var CustomerSchema = new Schema({
   name: {
     type: String,
-    min: [4, "Too few characters"],
+    min: [5, "Too few characters"],
     max: [24, "Too many characters"],
     required: "Where is the name ?"
   },
   phoneNumber: {
     type: String,
-    min: [4, "Too few characters"],
-    max: [24, "Too many characters"],
+    min: [8, "Too few numbers"],
+    max: [15, "Too many numbers"],
     required: "Where is the phoneNumber ?"
   },
   address_1: {
@@ -31,7 +31,11 @@ var CustomerSchema = new Schema({
   postCode: {
     type: String,
     required: "What is the postCode ?"
-  }
+  },
+  transactions: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Transaction'
+}],
 }, {discriminatorKey: 'user'});
 
 var Customer = User.discriminator("Customer", CustomerSchema);
