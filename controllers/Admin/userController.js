@@ -94,7 +94,7 @@ exports.listUser = (req, res) => {
   if(Object.keys(req.query).length == 0){
     user.find(
       {},
-      "user username name phoneNumber email created_at",
+      "user username name last_login email created_at",
       (err, _user) => {
         res.json(_user);
       }
