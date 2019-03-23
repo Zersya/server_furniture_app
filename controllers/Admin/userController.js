@@ -105,7 +105,7 @@ exports.listUser = (req, res) => {
         {name: { $regex: ".*" + req.query.searchName + ".*" }},
         {user: { $regex: ".*" + req.query.searchType + ".*" }}
       ]},
-      "user username name phoneNumber email created_at",
+      "user username name last_login email created_at",
       (err, _user) => {
         res.json(_user);
       }
