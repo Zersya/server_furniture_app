@@ -96,7 +96,15 @@ exports.listUser = (req, res) => {
       {},
       "user username name last_login email created_at",
       (err, _user) => {
-        res.json(_user);
+        if(_user){
+          res.json(_user);
+        }
+        else{
+          res.json({
+            success: true,
+            message: "Users is Empty"
+          });
+        }
       }
     );
   }else{
@@ -107,7 +115,14 @@ exports.listUser = (req, res) => {
       ]},
       "user username name last_login email created_at",
       (err, _user) => {
-        res.json(_user);
+        if(_user){
+          res.json(_user);
+        }else{
+          res.json({
+            success: true,
+            message: "Users is Empty"
+          });
+        }
       }
     );
   }
@@ -120,5 +135,14 @@ exports.detailUser = (req, res) => {
     userId,
     "username name phoneNumber email address_1 address_2 city postCode last_login transaction",
   ).populate('Transaction')
-  .exec((err, __user) => res.json(__user));
+  .exec((err, __user) => {
+    if(__user){
+      res.json(__user)
+    }else{
+      res.json({
+        success: true,
+        message: "User not found"
+      });
+    }
+  });
 };
