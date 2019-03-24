@@ -10,7 +10,6 @@ exports.createItem = (req, res) => {
   var prevBody = req.body;
   user.findOne({ username: dataUser.username }, (err, _user) => {
     if (err) res.send(err);
-
     if (_user) {
       req.body = Object.assign(prevBody, {
         created_by: _user._id
@@ -36,6 +35,11 @@ exports.createItem = (req, res) => {
         });
         newItem.save(callbackSave);
       }
+    }else{
+      res.json({
+        success: false,
+        message: "User not found"
+      });
     }
   });
 

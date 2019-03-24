@@ -13,14 +13,16 @@ const DEFAULT_BUCKET_NAME = "harpah_images_items"; // Replace with the name of y
  * @return {*}
  */
 exports.sendUploadToGCS = (req, res, next) => {
-  if (!req.files) {
-    return next();
+  console.log(req.files)
+  if (req.files.length == 0) {
+    next();
   }
 
   const bucketName = req.body.bucketName || DEFAULT_BUCKET_NAME;
 
   const bucket = storage.bucket(bucketName);
   var filename = ''
+
   item.findById(req.params.itemId, (err, _item) => {
     if (err) {
       res.json({
