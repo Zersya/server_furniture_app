@@ -1,6 +1,8 @@
 var mongoose = require("mongoose"),
   Schema = mongoose.Schema,
-  User = require("./userModel");
+  User = require("./userModel")
+  Cart = require('../transaction/cart/cartModel')
+  ItemCart = require('../transaction/cart/itemCartModel');
 
 var CustomerSchema = new Schema({
   name: {
@@ -35,7 +37,11 @@ var CustomerSchema = new Schema({
   transactions: [{
     type: Schema.Types.ObjectId,
     ref: 'Transaction'
-}],
+  }],
+  cart: {
+    type: Schema.Types.ObjectId,
+    ref: 'Cart'
+  }
 }, {discriminatorKey: 'user'});
 
 var Customer = User.discriminator("Customer", CustomerSchema);

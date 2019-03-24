@@ -126,20 +126,27 @@ checkTokenCustomer = (req, res, next) => {
       return function(err, _user) {
         if (err) res.send(err);
 
-        var check = tokenUtils.checkBlacklistedToken(token, _user);
-        if (check) {
-          return res.json({
-            success: false,
-            message: "Token is blacklisted"
-          });
-        } else {
-          if (req.decoded.user == "Customer") next();
-          else {
+        if(_user){
+          var check = tokenUtils.checkBlacklistedToken(token, _user);
+          if (check) {
             return res.json({
               success: false,
-              message: "You are not able to do this action"
+              message: "Token is blacklisted"
             });
+          } else {
+            if (req.decoded.user == "Customer") next()
+            else {
+              return res.json({
+                success: false,
+                message: "You are not able to do this action"
+              });
+            }
           }
+        }else{
+          return res.json({
+            success: false,
+            message: "Token is not valid"
+          });
         }
       };
     }

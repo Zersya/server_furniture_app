@@ -69,4 +69,11 @@ UserSchema.pre("findOneAndUpdate", function(next) {
 });
 
 
+UserSchema.pre("findOneAndDelete", function(next) {
+  Cart.findOneAndDelete({created_by: this._conditions._id}).exec((err, _cart) => {
+    ItemCart.deleteMany({cart: _cart._id}).exec()
+    next()
+  })
+})
+
 module.exports = mongoose.model("User", UserSchema);

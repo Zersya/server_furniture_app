@@ -7,12 +7,15 @@ exports.getDataFromToken = (req) => {
       // Remove Bearer from string
       token = token.slice(7, token.length);
     }
-    var username = "";
+    var username = "",
+        _id = '';
     jwt.verify(token, process.env.secret, (err, decode) => {
+      _id = decode._id;     
       username = decode.username;
     });
     return {
       token: token,
+      _id: _id,
       username: username
     };
   }

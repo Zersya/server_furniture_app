@@ -36,7 +36,7 @@ exports.login = (req, res) => {
       if (err) res.send(err);
       if (isMatch) {
         var token = jwt.sign(
-          { user: _user.user, username: username },
+          { user: _user.user, username: username, _id: _user._id },
           process.env.secret,
           { expiresIn: "24h" }
         );
