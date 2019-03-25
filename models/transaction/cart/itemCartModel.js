@@ -6,11 +6,6 @@ var ItemCartSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Item',
     },
-    cart: {
-        type: Schema.Types.ObjectId,
-        ref: 'Cart',
-        required: 'Where is the Cart ?'
-    },
     quantity:{
         type: Number,
     },

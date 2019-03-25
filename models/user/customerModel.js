@@ -34,14 +34,6 @@ var CustomerSchema = new Schema({
     type: String,
     required: "What is the postCode ?"
   },
-  transactions: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Transaction'
-  }],
-  cart: {
-    type: Schema.Types.ObjectId,
-    ref: 'Cart'
-  }
 }, {discriminatorKey: 'user'});
 
 var Customer = User.discriminator("Customer", CustomerSchema);

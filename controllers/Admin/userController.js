@@ -32,27 +32,30 @@ exports.deleteUser = (req, res) => {
 
   function callbackDeleteUser() {
     return function(err, _user) {
-      if (_user) {
-        if (_user.username == "admin") {
+      if (err) res.send(err);
+      else {
+        if (_user) {
+          if (_user.username == "admin") {
+            res.json({
+              success: false,
+              message: "Cannot delete super admin"
+            });
+          } else {
+            user.findOneAndDelete({ _id: userId }, (err, __user) => {
+              if (err) res.send(err);
+              
+              res.json({
+                success: true,
+                message: "Success deleted " + __user.username
+              });
+            });
+          }
+        } else {
           res.json({
             success: false,
-            message: "Cannot delete super admin"
-          });
-        } else {
-          user.findOneAndDelete({ _id: userId }, (err, __user) => {
-            if (err) res.send(err);
-
-            res.json({
-              success: true,
-              message: "Success deleted " + __user.username
-            });
+            message: "User Id " + userId + " not found"
           });
         }
-      } else {
-        res.json({
-          success: false,
-          message: "User Id " + userId + " not found"
-        });
       }
     };
   }
@@ -91,15 +94,14 @@ exports.updateUser = (req, res) => {
 };
 
 exports.listUser = (req, res) => {
-  if(Object.keys(req.query).length == 0){
+  if (Object.keys(req.query).length == 0) {
     user.find(
       {},
       "user username name last_login email created_at",
       (err, _user) => {
-        if(_user){
+        if (_user) {
           res.json(_user);
-        }
-        else{
+        } else {
           res.json({
             success: true,
             message: "Users is Empty"
@@ -107,17 +109,19 @@ exports.listUser = (req, res) => {
         }
       }
     );
-  }else{
+  } else {
     user.find(
-      {$or: [
-        {name: { $regex: ".*" + req.query.searchName + ".*" }},
-        {user: { $regex: ".*" + req.query.searchType + ".*" }}
-      ]},
+      {
+        $or: [
+          { name: { $regex: ".*" + req.query.searchName + ".*" } },
+          { user: { $regex: ".*" + req.query.searchType + ".*" } }
+        ]
+      },
       "user username name last_login email created_at",
       (err, _user) => {
-        if(_user){
+        if (_user) {
           res.json(_user);
-        }else{
+        } else {
           res.json({
             success: true,
             message: "Users is Empty"
@@ -131,18 +135,20 @@ exports.listUser = (req, res) => {
 exports.detailUser = (req, res) => {
   const userId = req.params.userId;
 
-  user.findById(
-    userId,
-    "username name phoneNumber email address_1 address_2 city postCode last_login transaction",
-  ).populate('Transaction')
-  .exec((err, __user) => {
-    if(__user){
-      res.json(__user)
-    }else{
-      res.json({
-        success: true,
-        message: "User not found"
-      });
-    }
-  });
+  user
+    .findById(
+      userId,
+      "username name phoneNumber email address_1 address_2 city postCode last_login transaction"
+    )
+    .populate("Transaction")
+    .exec((err, __user) => {
+      if (__user) {
+        res.json(__user);
+      } else {
+        res.json({
+          success: true,
+          message: "User not found"
+        });
+      }
+    });
 };

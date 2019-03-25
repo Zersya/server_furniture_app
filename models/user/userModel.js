@@ -1,6 +1,10 @@
 var mongoose = require("mongoose"),
   bcrypt = require("bcrypt"),
-  Schema = mongoose.Schema;
+  Schema = mongoose.Schema
+  cart = require('../transaction/cart/cartModel')
+  itemCart = require('../transaction/cart/itemCartModel')
+  trans = require('../transaction/transactionModel')
+  cartTrans = require('../transaction/cartTransactionModel');
 
 var UserSchema = new Schema(
   {
@@ -70,10 +74,19 @@ UserSchema.pre("findOneAndUpdate", function(next) {
 
 
 UserSchema.pre("findOneAndDelete", function(next) {
-  Cart.findOneAndDelete({created_by: this._conditions._id}).exec((err, _cart) => {
-    ItemCart.deleteMany({cart: _cart._id}).exec()
-    next()
+  cart.findOneAndDelete({created_by: this._conditions._id}).exec((err, _cart) => {
+    _cart.itemCarts.forEach(element => {
+      itemCart.deleteOne({_id: element}).exec()
+    });
   })
+
+  trans.findOneAndDelete({created_by: this._conditions._id}).exec((err, _trans) => {
+    _trans.cart.forEach(element => {
+      cartTrans.deleteOne({_id: element}).exec()
+    });
+  })
+
+  next()
 })
 
 module.exports = mongoose.model("User", UserSchema);

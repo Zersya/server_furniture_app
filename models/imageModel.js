@@ -10,10 +10,6 @@ var FileSchema = new Schema({
         type: String,
         required: 'Where is the nameImages ?'
     },
-    item: {
-        type: Schema.Types.ObjectId,
-        ref: 'Item',
-    },
     created_date: {
         type: Date,
         default: new Date

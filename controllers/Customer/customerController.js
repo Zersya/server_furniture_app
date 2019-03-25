@@ -7,7 +7,6 @@ var item = require('../../models/itemModel')
 exports.createCustomer = (req, res) => {
   const newCustomer = new customer(req.body);
   var newCart = new cart({created_by: newCustomer._id})
-  newCustomer.cart = newCart._id;
 
   newCustomer.save((err, _customer) => {
     if (err) res.send(err);

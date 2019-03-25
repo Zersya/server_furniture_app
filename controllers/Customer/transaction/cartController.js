@@ -7,16 +7,19 @@ var tokenUtils = require("../../../Utils/tokenUtils");
 
 exports.addToCart = (req, res) => {
   var itemId = req.query.itemId;
+  var cartId = ''
   var quantity = parseInt(req.query.quantity);
   var dataUser = tokenUtils.getDataFromToken(req);
-  
   cart.findOne({ created_by: dataUser._id }).exec(callbackFindCart());
 
   function callbackFindCart() {
     return function(err, _cart) {
       if (err) res.send(err);
       else {
-        item_cart.findById(itemId, callbackFindItemCart(_cart));
+        if (_cart) {
+          cartId = _cart._id
+          item_cart.findById(itemId, callbackFindItemCart(_cart));
+        }
       }
     };
   }
@@ -26,18 +29,19 @@ exports.addToCart = (req, res) => {
       if (err) res.send(err);
 
       if (_item_cart) {
-        quantity ? (_item_cart.quantity += quantity) : (_item_cart.quantity += 1);
+        quantity
+          ? (_item_cart.quantity += quantity)
+          : (_item_cart.quantity += 1);
         quantity
           ? (_item_cart.priceAll += _item_cart.priceOne * quantity)
           : (_item_cart.priceAll += _item_cart.priceOne);
         _item_cart.save(callbackSaveItem());
       } else {
         getItemData((err, _item) => {
-          if(err) res.send(err)
-          else{
+          if (err) res.send(err);
+          else {
             var newItem_cart = new item_cart({
               _id: itemId,
-              cart: _cart._id,
               quantity: quantity ? quantity : 1,
               priceOne: _item.price,
               priceAll: _item.price * quantity || _item.price
@@ -46,7 +50,7 @@ exports.addToCart = (req, res) => {
             _cart.save();
             newItem_cart.save(callbackSaveItem());
           }
-        })
+        });
       }
     };
   }
@@ -59,7 +63,7 @@ exports.addToCart = (req, res) => {
     return function(err, doc) {
       if (err) res.send(err);
       if (doc) {
-        addingPriceTotalCart("Sukses menambahkan ke keranjang.", doc.cart, res);
+        addingPriceTotalCart("Sukses menambahkan ke keranjang.", cartId, res);
       } else {
         res.json({
           success: false,
@@ -84,7 +88,7 @@ exports.removeFromCart = (req, res) => {
         item_cart.findOneAndDelete({ _id: itemId }, (err, doc) => {
           if (err) res.send(err);
           else
-            addingPriceTotalCart("Success to delete item cart", doc.cart, res);
+            addingPriceTotalCart("Success to delete item cart", _cart._id, res);
         });
       }
     }
@@ -110,7 +114,7 @@ exports.changeQuantity = (req, res) => {
             else
               addingPriceTotalCart(
                 "Success change quantity item",
-                doc.cart,
+                _cart._id,
                 res
               );
           });
@@ -123,20 +127,22 @@ exports.changeQuantity = (req, res) => {
 exports.listItemCart = (req, res) => {
   var dataUser = tokenUtils.getDataFromToken(req);
 
-  cart.find({created_by: dataUser._id})
-  .populate('itemCarts')
-  .populate('created_by', 'name')
-  .exec((err, _cart) => {
-    if(err) res.send(err)
-    else{
-      if(_cart) res.json(_cart)
-      else res.json({
-        success: true,
-        message: 'Keranjang anda kosong'
-      });
-    }
-  }) 
-}
+  cart
+    .find({ created_by: dataUser._id })
+    .populate("itemCarts")
+    .populate("created_by", "name")
+    .exec((err, _cart) => {
+      if (err) res.send(err);
+      else {
+        if (_cart) res.json(_cart);
+        else
+          res.json({
+            success: true,
+            message: "Keranjang anda kosong"
+          });
+      }
+    });
+};
 
 function addingPriceTotalCart(_String, cartId, res) {
   return cart
