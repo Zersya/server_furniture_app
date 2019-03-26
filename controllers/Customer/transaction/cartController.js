@@ -63,7 +63,7 @@ exports.addToCart = (req, res) => {
     return function(err, doc) {
       if (err) res.send(err);
       if (doc) {
-        addingPriceTotalCart("Sukses menambahkan ke keranjang.", cartId, res);
+        addingPriceTotalCart("Success adding to the cart.", cartId, res);
       } else {
         res.json({
           success: false,
@@ -138,7 +138,7 @@ exports.listItemCart = (req, res) => {
         else
           res.json({
             success: true,
-            message: "Keranjang anda kosong"
+            message: "Your cart is empty"
           });
       }
     });
@@ -171,7 +171,7 @@ function addingPriceTotalCart(_String, cartId, res) {
         } else {
           res.json({
             success: false,
-            message: "Cart tidak ditemukan"
+            message: "Cart is not found"
           });
         }
       }

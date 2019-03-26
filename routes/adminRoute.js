@@ -21,9 +21,12 @@ module.exports = app => {
   app.route('/api/admin/manage_transaction')
   .get(authMiddleware.checkTokenAdmin, trans.listTransaction)
 
-  app.route('/api/admin/manage_transaction/:transactionId')
+  app.route('/api/admin/manage_transaction/:tid')
   .get(authMiddleware.checkTokenAdmin, trans.detailTransaction)
-  
+  .put(authMiddleware.checkTokenAdmin, trans.changeStatusTransaction)
+  .delete(authMiddleware.checkTokenAdmin, trans.deleteTransaction)
+
+
   //============================================== USER ==============================================================
   app
     .route("/api/admin/manage_user")

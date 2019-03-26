@@ -41,12 +41,12 @@ exports.submitOrder = (req, res) => {
           } else
             res.json({
               success: false,
-              message: "Silahkan belanja terlebih dahulu"
+              message: "Please add item to the cart first."
             });
         } else
           res.json({
             success: false,
-            message: "Cart tidak ditemukan"
+            message: "Cart is not found"
           });
       }
     };
@@ -73,7 +73,7 @@ exports.submitOrder = (req, res) => {
     else
       res.json({
         success: true,
-        message: "Sukses menambahkan orderan"
+        message: "Success adding new transaction"
       });
   };
 };
@@ -91,12 +91,12 @@ exports.cancelOrder = (req, res) => {
           res.json({
             success: true,
             message:
-              "Orderan tidak dapat dibatalkan, harap hubungi pihak admin."
+              "Cannot cancel the transaction, please contact admin."
           });
       } else {
         res.json({
           success: false,
-          message: "Orderan tidak ada."
+          message: "Transaction not found."
         });
       }
     }
@@ -110,7 +110,7 @@ exports.cancelOrder = (req, res) => {
         else
           res.json({
             success: true,
-            message: "Sukses membatalkan pesanan, silahkan belanja kembali."
+            message: "Success cancel the transaction."
           });
       });
   };
@@ -130,7 +130,7 @@ exports.lisTransactionCustomer = (req, res) => {
         else
           res.json({
             success: true,
-            message: "Anda tidak memiliki transaksi sebelumnya"
+            message: "Recent transaction is empty"
           });
       }
     });
