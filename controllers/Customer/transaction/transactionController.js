@@ -32,11 +32,12 @@ exports.submitOrder = (req, res) => {
               };
 
               dt_trans_cart.items.push(items);
+              item_cart.deleteOne({ _id: element }).exec();
+
             });
 
             var newCart = new cartTrans(dt_trans_cart);
             newCart.save(addingNewTransaction);
-            item_cart.deleteMany({ cart: _cart._id }).exec();
           } else
             res.json({
               success: false,

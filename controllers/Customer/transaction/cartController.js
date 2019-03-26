@@ -61,7 +61,6 @@ exports.addToCart = (req, res) => {
 
   function callbackSaveItem() {
     return function(err, doc) {
-      console.log(doc);
       if (err) res.send(err);
       if (doc) {
         addingPriceTotalCart("Sukses menambahkan ke keranjang.", cartId, res);
@@ -154,9 +153,12 @@ function addingPriceTotalCart(_String, cartId, res) {
       else {
         if (_cart) {
           var priceTotal = 0;
+
           _cart.itemCarts.forEach(element => {
             priceTotal += element.priceAll;
           });
+          // console.log(priceTotal)
+
           _cart.price = priceTotal;
           _cart.save(err => {
             if (err) res.send(err);

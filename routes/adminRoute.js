@@ -1,5 +1,6 @@
 var user = require("../controllers/Admin/userController");
 var item = require("../controllers/Admin/itemController");
+var trans = require("../controllers/Admin/transactionController");
 
 var Multer = require("multer");
 
@@ -14,6 +15,15 @@ const multer = Multer({
 });
 
 module.exports = app => {
+
+  //============================================== TRANSACTION ==============================================================
+
+  app.route('/api/admin/manage_transaction')
+  .get(authMiddleware.checkTokenAdmin, trans.listTransaction)
+
+  app.route('/api/admin/manage_transaction/:transactionId')
+  .get(authMiddleware.checkTokenAdmin, trans.detailTransaction)
+  
   //============================================== USER ==============================================================
   app
     .route("/api/admin/manage_user")

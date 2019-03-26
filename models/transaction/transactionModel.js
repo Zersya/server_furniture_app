@@ -15,8 +15,12 @@ var TransactionSchema = new Schema({
         type: String,
         required: 'What is the status_transaction ?'
     },
-    description: {
+    custom_description: {
         type: String,
+    },
+    created_at: {
+        type: Date,
+        default: new Date()
     }
 })
 
