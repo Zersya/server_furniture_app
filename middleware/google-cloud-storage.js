@@ -13,7 +13,7 @@ const DEFAULT_BUCKET_NAME = "harpah_images_items"; // Replace with the name of y
  * @return {*}
  */
 exports.sendUploadToGCS = (req, res, next) => {
-  console.log(req.files)
+  // console.log(req.files)
   if (!req.files) {
     res.json({
       success: false,
@@ -38,13 +38,14 @@ exports.sendUploadToGCS = (req, res, next) => {
         message: "ItemId not valid"
       });
     } else {
-      filename = req.body.name || _item.name;
-      processImages();
+      filename = Object.keys(req.body).length == 0 ? _item.name : req.body.name ;
+
+      processImages(filename);
     }
   });
 
   var files = [];
-  function processImages() {
+  function processImages(filename) {
     return req.files.forEach((element, i) => {
       const gcsFileName = `${Date.now()}-${filename}-${i}`;
       element.gcsUrl = i;

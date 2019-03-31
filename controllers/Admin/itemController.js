@@ -169,9 +169,7 @@ exports.deleteOnlyImage = (req, res) => {
       if (err) res.send(err);
       else {
         if (_item) {
-          _item.images.forEach(element => {
-            image.findByIdAndDelete(element._id, callbackImageFind());
-          });
+          image.findByIdAndDelete(imageId, callbackImageFind(_item));
         } else {
           res.json({
             success: false,
@@ -182,13 +180,13 @@ exports.deleteOnlyImage = (req, res) => {
     };
   }
 
-  function callbackImageFind() {
+  function callbackImageFind(_item) {
     return function(err, _image) {
       if (err) res.send(err);
       else {
         if (_image) {
           item.updateOne(
-            { _id: _image.item },
+            { _id: _item._id },
             { $pull: { images: _image._id } },
             deleteGoogleImages(_image)
           );
@@ -224,6 +222,7 @@ exports.addOnlyImage = (req, res) => {
 
   item.findById(itemId, (err, _item) => {
     if (err) res.send(err);
+    var newImage;
 
     if (_item) {
       req.files.forEach(element => {
@@ -232,11 +231,12 @@ exports.addOnlyImage = (req, res) => {
           nameImage: element.cloudStorageObject,
           urlImage: element.gcsUrl
         };
-        var newImage = new image(_image);
+        newImage = new image(_image);
         _item.images.push(newImage._id);
-        _item.save();
-        newImage.save(callbackSave);
+
+        newImage.save();
       });
+      _item.save(callbackSave);
     } else {
       res.json({
         success: false,
@@ -245,10 +245,9 @@ exports.addOnlyImage = (req, res) => {
     }
   });
 
-  var callbackSave = (err, item) => {
+  var callbackSave = err => {
     if (err) res.send(err);
-
-    if (item) {
+    else {
       res.json({
         success: true,
         message: "Adding success"
