@@ -121,7 +121,7 @@ exports.lisTransactionCustomer = (req, res) => {
 
   transaction
     .find({ created_by: dataUser._id })
-    .populate("cart")
+    .populate({ path: "cart",populate: {path:'items.itemId', populate: {path:'images'}}} )
     .populate("created_by", "username name email phoneNumber")
     .exec((err, _transaction) => {
       if (err) res.send(err);

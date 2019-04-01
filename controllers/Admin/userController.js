@@ -2,6 +2,7 @@ var jwt = require("jsonwebtoken");
 
 var admin = require("../../models/user/adminModel");
 var user = require("../../models/user/userModel");
+var transaction = require("../../models/transaction/transactionModel");
 
 exports.createAdmin = (req, res) => {
   const newAdmin = new admin(req.body);
@@ -43,7 +44,7 @@ exports.deleteUser = (req, res) => {
           } else {
             user.findOneAndDelete({ _id: userId }, (err, __user) => {
               if (err) res.send(err);
-              
+
               res.json({
                 success: true,
                 message: "Success deleted " + __user.username
@@ -97,7 +98,7 @@ exports.listUser = (req, res) => {
   if (Object.keys(req.query).length == 0) {
     user.find(
       {},
-      "user username name last_login email created_at",
+      "user username name last_login email created_at, phoneNumber",
       (err, _user) => {
         if (_user) {
           res.json(_user);
@@ -143,7 +144,18 @@ exports.detailUser = (req, res) => {
     .populate("Transaction")
     .exec((err, __user) => {
       if (__user) {
-        res.json(__user);
+        transaction
+          .find({ created_by: userId })
+          .populate({ path: "cart",populate: {path:'items.itemId', populate: {path:'images'}}} )
+          .exec((err, _transaction) => {
+            if (err) res.send(err);
+            else {
+              var u = __user.toObject()
+              u.transaction = _transaction
+              res.json(u);
+
+            }
+          });
       } else {
         res.json({
           success: true,
