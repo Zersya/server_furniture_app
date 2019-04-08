@@ -98,7 +98,7 @@ exports.listUser = (req, res) => {
   if (Object.keys(req.query).length == 0) {
     user.find(
       {},
-      "user username name last_login email created_at, phoneNumber",
+      "user username name last_login email created_at phoneNumber address_1 address_2 city postCode",
       (err, _user) => {
         if (_user) {
           res.json(_user);
@@ -118,7 +118,7 @@ exports.listUser = (req, res) => {
           { user: { $regex: ".*" + req.query.searchType + ".*" } }
         ]
       },
-      "user username name last_login email created_at",
+      "user username name last_login email created_at phoneNumber address_1 address_2 city postCode",
       (err, _user) => {
         if (_user) {
           res.json(_user);
