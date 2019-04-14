@@ -133,7 +133,7 @@ exports.listItemCart = (req, res) => {
       path: "itemCarts",
       populate: {
         path: "_id",
-        select: "name",
+        populate: { path: "images", select: "urlImage" }
       }
     })
     .populate("created_by", "name")
