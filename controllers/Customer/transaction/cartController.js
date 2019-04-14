@@ -129,7 +129,13 @@ exports.listItemCart = (req, res) => {
 
   cart
     .find({ created_by: dataUser._id })
-    .populate("itemCarts")
+    .populate({
+      path: "itemCarts",
+      populate: {
+        path: "_id",
+        select: "name",
+      }
+    })
     .populate("created_by", "name")
     .exec((err, _cart) => {
       if (err) res.send(err);
