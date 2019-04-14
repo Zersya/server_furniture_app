@@ -1,6 +1,6 @@
 const { Storage } = require("@google-cloud/storage");
 
-const GOOGLE_CLOUD_PROJECT_ID = "harpah-app"; // Replace with your project ID
+const GOOGLE_CLOUD_PROJECT_ID = "harpah-app-reborn"; // Replace with your project ID
 const GOOGLE_CLOUD_KEYFILE = __dirname + '/resources/gcs/harpah-app-reborn-d1fde9f170fc.json';
 
 exports.storage = new Storage({

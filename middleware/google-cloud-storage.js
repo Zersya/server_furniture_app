@@ -3,7 +3,7 @@ const item = require("../models/itemModel");
 
 const { storage } = gcsHelpers;
 
-const DEFAULT_BUCKET_NAME = "harpah_images_items"; // Replace with the name of your bucket
+const DEFAULT_BUCKET_NAME = "harpah_reborn_images_items"; // Replace with the name of your bucket
 
 /**
  * Middleware for uploading file to GCS.
