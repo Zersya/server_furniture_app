@@ -12,7 +12,7 @@ module.exports = app => {
     .get(authMiddleware.checkTokenCustomer, customer.listItem)
     
   app.route('/api/customer/check')
-  .get(authMiddleware, auth.checkLogin);
+  .get(authMiddleware.checkTokenCustomer, auth.checkLogin);
 
   app
     .route("/api/customer/transaction")
