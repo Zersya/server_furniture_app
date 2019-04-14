@@ -1,5 +1,6 @@
 var customer = require("../controllers/Customer/customerController");
 var cart = require("../controllers/Customer/transaction/cartController");
+var auth = require("../controllers/Auth/authController");
 var transaction = require("../controllers/Customer/transaction/transactionController");
 var authMiddleware = require("../middleware/authMiddleware");
 
@@ -11,8 +12,8 @@ module.exports = app => {
     .get(authMiddleware.checkTokenCustomer, customer.listItem)
     
   app.route('/api/customer/check')
-  .get(authMiddleware);
-  
+  .get(authMiddleware, auth.checkLogin);
+
   app
     .route("/api/customer/transaction")
     .get(authMiddleware.checkTokenCustomer, transaction.lisTransactionCustomer)

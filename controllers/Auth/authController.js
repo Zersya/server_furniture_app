@@ -62,7 +62,10 @@ exports.login = (req, res) => {
 };
 
 exports.checkLogin = (req, res) => {
-
+  res.json({
+    success: true,
+    message: "Authentication success",
+  });
 }
 
 exports.forgetPassword = (req, res) => {
