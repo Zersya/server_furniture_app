@@ -61,6 +61,10 @@ exports.login = (req, res) => {
   }
 };
 
+exports.checkLogin = (req, res) => {
+
+}
+
 exports.forgetPassword = (req, res) => {
   var email = req.body.email;
 

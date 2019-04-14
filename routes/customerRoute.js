@@ -10,7 +10,9 @@ module.exports = app => {
     .route("/api/customer")
     .get(authMiddleware.checkTokenCustomer, customer.listItem)
     
-
+  app.route('/api/customer/check')
+  .get(authMiddleware);
+  
   app
     .route("/api/customer/transaction")
     .get(authMiddleware.checkTokenCustomer, transaction.lisTransactionCustomer)
