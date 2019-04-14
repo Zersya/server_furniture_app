@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "harpah-app",
+  "private_key_id": "75a48838ce7751374f0eb4aaa2c25dc9255604cb",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCdXgphKKvU4OsO\n7xEi6ve5gr+baXa3lhhiO51+EDWDWogDJJ/hwSYU4dyabuZUMqIOiEW7DfjZylYv\nie07GrNheQgAUrSdMyJGl69iUNQu6+TFzg6giFP51H/rAcjrs10ZYHqNoM8kBYGW\nyNgcQpUrEtGc1AYAfFswQXvssBmCemnH3QYj7lnUFsBBDXY+Y8LzmEmCbFDgaMq2\nr/lqZcNCpLCJ4p2rdBm89AgtWG87YJFx+Fx+xc9+IBQotmZFRrMF1PgGDh/2yOYr\noEDd2yMD4P6Ez8nZRR1t1nD/eMQUZs9GT+nwX2xkRlDaeiaTOy9R6o10iih7GY1A\n/AQftEvrAgMBAAECggEADUq1pro4NU1gHU1NDb15+hXUmExipiQL4DQ327+DvZoG\ndfmAdaGKVWY0a2jllIQIUyDofuGxvLeN6wsD2iOpthhyeBCER+jbQsoqGqxIF8R9\n+MUsUBvjt+zedxuZ/GqUeQHAqDjGdjzu0q0ZL93h2pcG1G/GKAFY9Gz7iiTfqrkJ\nPft7juRMCFhn67/5U+odbMo3B+xUYaKq9vS/Qr8mw7x/k4ctQmXm2ykU5e3A2r4q\nnavy45uM3rAW/nBxwHdDurF1IaWf2x+L1k4EGzcm5gh4+8niDtKaHz+DuW7Tfx4s\nA36i0Duqy4kHV9j/D8ey3UwVs3ifrqYqW+wqlffeHQKBgQDWg04dW1+wzlh9kyt8\n3eZ7q4afkf99pGtqlNXhE6s/UQPIB6RWMPBByaZgBgmCqeDFxyQ2A5tAC3+iyGGo\naHpAdUg99mP6zKi5FaleG8XgK5MXDItCqgyb0IjViXrY+dfw5aJxMZ/QKEaDQYWU\nC5HwHnzb8/rTjkNOsaR9f9Ww7QKBgQC7zWprKM3Kc9BUqX5+S7olmFL5CcZeRwRy\nWQmyP7mLL8ugPyZ+t5OgCPMmG0zaXs/DWa95QrOXUmT76F6Jg91vKt39pXJZHI6F\n7t6QYbFFGjw8sNtkiTW76mnjeEdcnpXYivaqlQ7IpSxGckzil/9UMnuXNU0TbUWP\ndwPLnmRNNwKBgDXsB8TFZUZyeDgIuJPIy9kmgs61yn1wyTefdiv/37ooyUSM9zhb\nUOmYoOPeYKGhxkixCF8zhOESguEOcc39hU2Srbg1qWgv7fGoikyHurPhADZ5BsCZ\nMlYwk1TqHCFSnH+Hmc/OY5fVp/PykntmdSbg4w3/RHvNdQnhCbIqYjL5AoGBAIhb\n+RX/lZSXDMA8JSVMlMcxV6WNTGQtynPAZILxNCZ0uLQMxkWhw2WiufGERwQTbWVZ\nHEi+fqmz4LDroqDUhxZtmKvP0jwTuQRUUXOiC1WyW+RxQYs4+TQNW38XWTFN0F1f\nYQSwoABdtc0ctuicFn8q/IPo5qLhZ21oq+/PfOJ3AoGAOvbpjpvqaAAWubApY0ev\n2aE34wRexNFptGUGe8Hhu+GHYJvNXndQhYzErvUpqCp1wDn+OmxXFuQecM3oSPCH\nHdxI5H4iyS9W9Z/lYHw5RsuEAjzVeYleORIyhFRPYVoTCQJOJdl1sKGf08/Bxe0D\nZwhss5tryIFwilMPAinQfO8=\n-----END PRIVATE KEY-----\n",
+  "client_email": "harpah-storage@harpah-app.iam.gserviceaccount.com",
+  "client_id": "107044552422726066566",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/harpah-storage%40harpah-app.iam.gserviceaccount.com"
+}
