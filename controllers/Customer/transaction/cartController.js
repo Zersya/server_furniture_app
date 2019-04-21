@@ -83,12 +83,19 @@ exports.removeFromCart = (req, res) => {
     { $pull: { itemCarts: itemId } },
     (err, _cart) => {
       if (err) res.send(err);
+      console.log(_cart);
 
       if (_cart) {
-        item_cart.findOneAndDelete({ _id: itemId }, (err, doc) => {
+        item_cart.findByIdAndDelete(itemId, (err, doc) => {
           if (err) res.send(err);
-          else
-            addingPriceTotalCart("Success to delete item cart", _cart._id, res);
+          else{
+            if(doc)
+              addingPriceTotalCart("Success to delete item cart", _cart._id, res);
+            else res.json({
+              success: false,
+              message: 'Cant find the item'
+            });
+          }
         });
       }
     }

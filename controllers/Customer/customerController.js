@@ -16,12 +16,17 @@ exports.createCustomer = (req, res) => {
         process.env.secret,
         { expiresIn: "24h" }
       );
-      newCart.save((err) => {if(err)res.send(err)})
-      res.json({
-        success: true,
-        message: "Sign up success",
-        token: token
-      });
+      newCart.save((err, _cart) => {
+        if(err)res.send(err)
+        if(_cart){
+          res.json({
+            success: true,
+            message: "Sign up success",
+            token: token
+          });
+        }
+      })
+      
     }
   });
 };

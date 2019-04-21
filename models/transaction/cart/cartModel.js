@@ -3,7 +3,8 @@ var mongoose = require("mongoose"),
 
 var CartSchema = new Schema({
   _id: {
-    type: Schema.Types.ObjectId
+    type: Schema.Types.ObjectId,
+    default: mongoose.Types.ObjectId
   },
   itemCarts: [
     {
